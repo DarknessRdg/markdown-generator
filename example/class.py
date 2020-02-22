@@ -25,8 +25,7 @@ class MyClassExample:
         self.count = count
 
     def get_count(self):
-        """
-        This method is used to get count's current value
+        """This method is used to get count's current value
 
         **Returns:**
             int: current value of count

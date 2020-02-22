@@ -1,24 +1,17 @@
 class BaseObject:
     """
-    Class to store function data
+    Class to store class or function data
     Attributes:
-        doc: function's docstring
+        doc: current object's docstring
+        name: objects name
+        children: list of other objects that are children of current object
     """
-    def __init__(self):
+    def __init__(self, name, parent, indent):
         self.doc = ''
-
-
-class Tree:
-    """
-    Tree to store an objects children
-    Attributes:
-        current: current objects
-        children: list of current's children objects
-    """
-
-    def __init__(self, current):
-        self.current = current
+        self.name = name
         self.children = []
+        self.parent = parent
+        self.indent = indent
 
-    def __len__(self):
-        return len(self.current)
+    def __str__(self):
+        return self.name

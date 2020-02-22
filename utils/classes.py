@@ -15,3 +15,9 @@ class BaseObject:
 
     def __str__(self):
         return self.name
+
+    def get_md_title(self):
+        if self.indent == 0:
+            return self.name
+        else:
+            return self.parent.get_md_title() + '.' + self.name

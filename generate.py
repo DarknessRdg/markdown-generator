@@ -1,8 +1,11 @@
 import os
 import utils.classes
 
-SRC_FOLDER = 'example'
+SRC_FOLDER = 'example'  # name to folder where src is saved
+SAVE_FOLDER = 'docs'  # name to folder where .md are going to be generated
 DEFAULT_INDENTATION = 4
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def is_python_file(file_name):
@@ -18,24 +21,34 @@ def get_object_doc(file, index, current_indentation=None):
     Get a object's docstring
     Args:
         file: list with file rows
-        index: line index witch starts docstring
-        current_indentation: string with current indentation 
+        index: line index witch starts function
+        current_indentation: int with current indentation level ex: 1, 2
+    Returns:
+        tuple with:
+            index: last line with docstring
+            docstring:
     """
-    if current_indentation is None:
-        current_indentation = ' ' * DEFAULT_INDENTATION
-    docstring_lines = ['']
+    docstring_delimiter = '"""'
+    index += 1
+    remove = current_indentation * DEFAULT_INDENTATION
 
+    docstring_lines = ['']
     line = file[index]
 
-    is_in_docstring = '"""' in line
-    while is_in_docstring:
-        line = line.replace(current_indentation, '')
-        docstring_lines.append(line)
+    cont_delimiters = line.count(docstring_delimiter)
+    while cont_delimiters < 2:
+        line = line[remove:]
+        line = line.strip() + '\n'
 
-        if '"""' in line:
-            is_in_docstring = False
+        docstring_lines.append(line)
         index += 1
-    return index, ''.join(docstring_lines)
+        line = file[index]
+        cont_delimiters += line.count(docstring_delimiter)
+
+    docstring = ''.join(docstring_lines)
+    docstring = docstring.strip().replace(docstring_delimiter, '')  # clear possible trashes
+
+    return index, docstring
 
 
 def clean_object_name(line):
@@ -49,7 +62,6 @@ def clean_object_name(line):
         index = line.index(key) + len(key)
 
     line = line[index:len(line) - 1]
-    print(line)
     return line
 
 
@@ -58,7 +70,6 @@ def get_indent(line):
     while i < len(line) and line[i] == ' ':
         cont += 1
         i += 1
-    # print(line, cont)
     return cont // DEFAULT_INDENTATION
 
 
@@ -78,14 +89,12 @@ def parse_python_file(file, current_line=0, current_indent=0, last_added=None, d
         return data
     line = file[current_line]
 
-    indent = ' ' * (current_indent * DEFAULT_INDENTATION)
-
     if line.strip().startswith('class ') or line.strip().startswith('def '):
         current_indent = get_indent(line)
         object_name = clean_object_name(line)
 
         new_object = utils.classes.BaseObject(object_name, last_added, current_indent)
-        index, docstring = get_object_doc(file, current_line, indent)
+        index, docstring = get_object_doc(file, current_line, current_indent)
         new_object.doc = docstring
 
         if current_indent == 0:  # no indentation
@@ -93,12 +102,11 @@ def parse_python_file(file, current_line=0, current_indent=0, last_added=None, d
         else:  # has indentation, so it is a nested object
             if current_indent > last_added.indent:  # indentation forward
                 last_added.children.append(new_object)
-            else:  # indentation back
+            else:  # indentation back or same
                 parent = last_added
                 while parent.indent >= current_indent:  # get parent
                     parent = parent.parent
                 parent.children.append(new_object)
-
         last_added = new_object
 
     parse_python_file(file, current_line + 1, current_indent, last_added, data)
@@ -106,22 +114,38 @@ def parse_python_file(file, current_line=0, current_indent=0, last_added=None, d
     return data
 
 
-def generate_python_md(file_path):
+def get_md_string(object_parsed):
+    title = object_parsed.get_md_title()
+    string = '### [{}](#{})\n'.format(title, title)
+    string += object_parsed.doc + '\n'
+
+    object_parsed.children.sort(key=lambda obj: obj.name)
+    for children in object_parsed.children:
+        print(children)
+        string += get_md_string(children)
+    return string
+
+
+def generate_python_md(file_path, folder=''):
     """Function to generate a markdown from a python file"""
     with open(file_path, 'r') as file:
         file_lines = [line for line in file]
     parsed = parse_python_file(file_lines)
 
+    path = os.path.join(BASE_DIR, SAVE_FOLDER, folder)
+    # with open(path, 'w') as output_file:
+    string = ''
+    for python_file in parsed:
+        string = get_md_string(python_file)
+    print(string)
 
 
 def generate():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-
-    files_path = '%s/%s/' % (base_dir, SRC_FOLDER)
+    """Main function to generate .md files from python files"""
+    files_path = os.path.join(BASE_DIR, SRC_FOLDER)
     for file_name in sorted(os.listdir(files_path)):
-
         if is_python_file(file_name):
-            path = files_path + '/%s' % file_name
+            path = os.path.join(files_path, file_name)
             generate_python_md(path)
 
 

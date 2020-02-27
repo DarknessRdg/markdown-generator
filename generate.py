@@ -223,6 +223,12 @@ def generate_python_md(file_path, file_name, folder=''):
 
 
 def generate_from_folder(folder_path, folder_name):
+    """
+    Function to generate .md from all .py file inside a folder
+    Args:
+        folder_path: string with absolute path to folder
+        folder_name: string with folder's name
+    """
     for file_name in sorted(os.listdir(folder_path)):
         path = os.path.join(folder_path, file_name)
         if is_python_file(file_name):

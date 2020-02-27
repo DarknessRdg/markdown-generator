@@ -1,3 +1,6 @@
+import contextlib
+
+
 class BaseObject:
     """
     Class to store class or function data
@@ -20,4 +23,8 @@ class BaseObject:
         if self.indent == 0:
             return self.name
         else:
-            return self.parent.get_md_title() + '.' + self.name
+            parent_name = self.parent.get_md_title()
+            with contextlib.suppress(ValueError):
+                parent_name = parent_name[:parent_name.index('(')]
+
+            return parent_name + '.' + self.name

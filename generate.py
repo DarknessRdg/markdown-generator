@@ -1,5 +1,4 @@
 import os
-import utils.classes
 import contextlib
 
 
@@ -8,6 +7,37 @@ SAVE_FOLDER = 'docs'  # name to folder where .md are going to be generated
 DEFAULT_INDENTATION = 4
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+class BaseObject:
+    """
+    Class to store class or function data
+    Attributes:
+        doc: current object's docstring
+        name: objects name
+        children: list of other objects that are children of current object
+        parent: reference to current object parent, or None has no parent
+        indent: int with objects indentation
+    """
+    def __init__(self, name, parent, indent):
+        self.doc = ''
+        self.name = name
+        self.children = []
+        self.parent = parent
+        self.indent = indent
+
+    def __str__(self):
+        return self.name
+
+    def get_md_title(self):
+        if self.indent == 0:
+            return self.name
+        else:
+            parent_name = self.parent.get_md_title()
+            with contextlib.suppress(ValueError):
+                parent_name = parent_name[:parent_name.index('(')]
+
+            return parent_name + '.' + self.name
 
 
 def is_python_file(file_name):
@@ -121,7 +151,7 @@ def parse_python_file(file, current_line=0, current_indent=0, last_added=None, d
         current_indent = get_indent(line)
         object_name = clean_object_name(line)
 
-        new_object = utils.classes.BaseObject(object_name, last_added, current_indent)
+        new_object = BaseObject(object_name, last_added, current_indent)
         index, docstring = get_object_doc(file, current_line, current_indent)
         new_object.doc = docstring
 
@@ -164,7 +194,13 @@ def get_md_string(object_parsed):
 
 
 def generate_python_md(file_path, file_name, folder=''):
-    """Function to generate a markdown from a python file"""
+    """
+    Function to generate a markdown from a python file
+    Args:
+        file_path: path to .py analysed
+        file_name: file's like file_name.py
+        folder: string with target folder name to save
+    """
     with open(file_path, 'r') as file:
         file_lines = [line for line in file]
     index, file_docstring = get_object_doc(file_lines, -1, 0)
@@ -179,19 +215,26 @@ def generate_python_md(file_path, file_name, folder=''):
 
     parsed.sort(key=lambda obj: obj.name)
     with open(path, 'w+') as output_file:
-        output_file.write(file_docstring)
+        if file_docstring:
+            output_file.write(file_docstring + '\n\n')
         for object_parsed in parsed:
             string = get_md_string(object_parsed)
             output_file.write(string)
 
 
+def generate_from_folder(folder_path, folder_name):
+    for file_name in sorted(os.listdir(folder_path)):
+        path = os.path.join(folder_path, file_name)
+        if is_python_file(file_name):
+            generate_python_md(path, file_name, folder_name)
+        elif is_not_hidden_folder(file_name):
+            generate_from_folder(path, os.path.join(folder_name, file_name))
+
+
 def generate():
     """Main function to generate .md files from python files"""
     files_path = os.path.join(BASE_DIR, SRC_FOLDER)
-    for file_name in sorted(os.listdir(files_path)):
-        if is_python_file(file_name):
-            path = os.path.join(files_path, file_name)
-            generate_python_md(path, file_name)
+    generate_from_folder(files_path, '')
 
 
 if __name__ == '__main__':

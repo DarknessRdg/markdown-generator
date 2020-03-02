@@ -1,5 +1,7 @@
 import os
 import contextlib
+import logging
+import sys
 
 
 SRC_FOLDER = 'example'  # name to folder where src is saved
@@ -61,19 +63,20 @@ def get_object_doc(file, index, current_indentation=None):
             docstring: String with with object's docstring
     """
     docstring_delimiter = '"""'
-    index += 1
-    remove = current_indentation * DEFAULT_INDENTATION
+    if not file or docstring_delimiter not in file[index + 1]:
+        return 0, ''
 
+    index += 1
     docstring_lines = ['']
     line = file[index]
 
-    cont_delimiters = line.count(docstring_delimiter)
+    cont_delimiters = 0
     if cont_delimiters == 2:  # docstring inline, ex: """docs"""
         docstring_lines.append(line.replace('"""', ''))
 
-    while 0 < cont_delimiters < 2:
-        line = line[remove:]
-        line = line.strip() + '\n'
+    while cont_delimiters < 2:
+        line = file[index].strip() + '\n'
+        cont_delimiters += line.count(docstring_delimiter)
 
         subtitles = ['**Args:**', '**Returns:**', '**Yields:**']
         line_lower = line.lower()
@@ -84,12 +87,9 @@ def get_object_doc(file, index, current_indentation=None):
 
         docstring_lines.append(line)
         index += 1
-        line = file[index]
-        cont_delimiters += line.count(docstring_delimiter)
 
     docstring = ''.join(docstring_lines)
     docstring = docstring.strip().replace(docstring_delimiter, '')  # clear possible trashes
-
     return index, docstring
 
 
@@ -182,6 +182,8 @@ def get_md_string(object_parsed):
         String with objects markdown
     """
     if object_parsed.name.startswith('__') or not object_parsed.doc:
+        if not object_parsed.doc:
+            logging.warning('Função/class sem docstring ' + object_parsed.name)
         return ''
     title = object_parsed.get_md_title()
     string = '### {}\n'.format(title)
@@ -201,25 +203,45 @@ def generate_python_md(file_path, file_name, folder=''):
         file_name: file's like file_name.py
         folder: string with target folder name to save
     """
-    with open(file_path, 'r') as file:
-        file_lines = [line for line in file]
-    index, file_docstring = get_object_doc(file_lines, -1, 0)
+    logging.info('Generating .md from python files fom file: ' + file_name)
+
+    with open(file_path, 'r', encoding='utf-8') as file:
+        file_lines = file.readlines()
+        logging.debug(f'File lines: {file_lines}')
+
+    if file_lines and file_lines[0].startswith('#!'):
+        start = 0
+    else:
+        start = -1
+    index, file_docstring = get_object_doc(file_lines, start, 0)
     parsed = parse_python_file(file_lines)
 
     file_name = file_name.replace('.py', '.md')
     save_folder_dir = os.path.join(BASE_DIR, SAVE_FOLDER, folder)
     path = os.path.join(save_folder_dir, file_name)
 
+    logging.debug(f'Folder path to save: {save_folder_dir}')
     with contextlib.suppress(FileExistsError):
         os.makedirs(save_folder_dir)
+    wrote_something = False
 
     parsed.sort(key=lambda obj: obj.name)
+    logging.debug(f'File path to save: {path}')
     with open(path, 'w+') as output_file:
         if file_docstring:
             output_file.write(file_docstring + '\n\n')
         for object_parsed in parsed:
             string = get_md_string(object_parsed)
+            if string:
+                wrote_something = True
             output_file.write(string)
+    if not wrote_something:
+        os.remove(path)
+        logging.debug(f'Nothing wrote on file: {path}')
+
+        if not os.listdir(save_folder_dir):
+            os.rmdir(save_folder_dir)
+            logging.debug(f'Delete empty folder: {save_folder_dir}')
 
 
 def generate_from_folder(folder_path, folder_name):
@@ -229,12 +251,16 @@ def generate_from_folder(folder_path, folder_name):
         folder_path: string with absolute path to folder
         folder_name: string with folder's name
     """
+
+    logging.info('Generating all .md from file inside folder ' + folder_name)
     for file_name in sorted(os.listdir(folder_path)):
         path = os.path.join(folder_path, file_name)
         if is_python_file(file_name):
             generate_python_md(path, file_name, folder_name)
         elif is_not_hidden_folder(file_name):
-            generate_from_folder(path, os.path.join(folder_name, file_name))
+            sub_paste_path = os.path.join(folder_name, file_name)
+
+            generate_from_folder(path, sub_paste_path)
 
 
 def generate():
@@ -243,5 +269,23 @@ def generate():
     generate_from_folder(files_path, '')
 
 
+def handle_arg(arg):
+    """
+    Function to handle what happens with args passed thought terminal
+    Args:
+        arg: String with arg passed
+    """
+    levels = {
+        '-v': logging.WARNING,
+        '-vv': logging.INFO,
+        '-vvv': logging.DEBUG
+    }
+
+    logging.basicConfig(level=levels[arg], format='%(name)-5s %(levelname)-8s %(message)s', )
+
+
 if __name__ == '__main__':
+    sys.argv.pop(0)
+    if sys.argv:
+        handle_arg(sys.argv[0])
     generate()

@@ -56,7 +56,6 @@ def get_object_doc(file, index, current_indentation=None):
     Args:
         file: list with file rows
         index: line index witch starts function
-        current_indentation: int with current indentation level ex: 1, 2
     Returns:
         tuple with:
             index: last line with docstring
@@ -78,11 +77,10 @@ def get_object_doc(file, index, current_indentation=None):
         line = file[index].strip() + '\n'
         cont_delimiters += line.count(docstring_delimiter)
 
-        subtitles = ['**Args:**', '**Returns:**', '**Yields:**']
-        line_lower = line.lower()
+        subtitles = ['Args:', 'Returns:', 'Yields:', 'Attributes:', 'Raises:']
         for sub in subtitles:
-            if sub.lower() in line_lower:
-                line += '\n'
+            if sub in line:
+                line = '\n{}\n'.format(line)
                 break
 
         docstring_lines.append(line)

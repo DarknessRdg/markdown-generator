@@ -50,7 +50,7 @@ def is_not_hidden_folder(file_name):
     return len(file_name.split('.')) == 1 and file_name != 'venv'
 
 
-def get_object_doc(file, index, current_indentation=None):
+def get_object_doc(file, index):
     """
     Get a object's docstring
     Args:
@@ -150,7 +150,7 @@ def parse_python_file(file, current_line=0, current_indent=0, last_added=None, d
         object_name = clean_object_name(line)
 
         new_object = BaseObject(object_name, last_added, current_indent)
-        index, docstring = get_object_doc(file, current_line, current_indent)
+        index, docstring = get_object_doc(file, current_line)
         new_object.doc = docstring
 
         if current_indent == 0:  # no indentation
@@ -211,7 +211,7 @@ def generate_python_md(file_path, file_name, folder=''):
         start = 0
     else:
         start = -1
-    index, file_docstring = get_object_doc(file_lines, start, 0)
+    index, file_docstring = get_object_doc(file_lines, start)
     parsed = parse_python_file(file_lines)
 
     file_name = file_name.replace('.py', '.md')

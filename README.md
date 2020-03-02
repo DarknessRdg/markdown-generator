@@ -34,3 +34,12 @@ A saída será:
    - testes
         - test1.md
 ```
+
+### List of Arguments
+É possível passar argumentos para o script
+
+Arg   | Explicação
+--------- | ------
+-v | mostra os loggs de warning
+-vv | mostra os loggs de warning e info
+-vvv | mostra os loggs todos os loggs: warning, info de debug

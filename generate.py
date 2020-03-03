@@ -77,9 +77,9 @@ def get_object_doc(file, index):
         line = file[index].strip() + '\n'
         cont_delimiters += line.count(docstring_delimiter)
 
-        subtitles = ['Args:', 'Returns:', 'Yields:', 'Attributes:', 'Raises:']
+        subtitles = ['**Args**', '**Returns**', '**Yields**', '**Attributes**', '**Raises**']
         for sub in subtitles:
-            if sub in line:
+            if sub in line or sub.replace('s**', 's:**') in line:
                 line = '\n{}\n'.format(line)
                 break
 

@@ -4,8 +4,8 @@ import logging
 import sys
 
 
-SRC_FOLDER = 'example'  # name to folder where src is saved
-SAVE_FOLDER = 'docs'  # name to folder where .md are going to be generated
+SRC_FOLDER = ''  # name to folder where src is saved
+SAVE_FOLDER = '../docs'  # name to folder where .md are going to be generated
 DEFAULT_INDENTATION = 4
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -50,6 +50,34 @@ def is_not_hidden_folder(file_name):
     return len(file_name.split('.')) == 1 and file_name != 'venv'
 
 
+def get_code_string_from_doc(file, index):
+    """
+    Get markownd code with all indentation from file.
+    i.e:
+    ```json
+    {
+        "url": "htpps://www.github.com/"
+    }
+
+    Args:
+        file: List. All
+    ```
+    """
+    code_delimiter = '```'
+    line = file[index]
+    remove = line.index(code_delimiter)
+    cont = 0
+    code_lines = []
+    while cont < 2:
+        line = file[index]
+        cont += line.count(code_delimiter)
+        code_lines.append(line[remove:])
+
+        index += 1
+
+    return index - 1, ''.join(code_lines)
+
+
 def get_object_doc(file, index):
     """
     Get a object's docstring
@@ -82,6 +110,9 @@ def get_object_doc(file, index):
             if sub in line:
                 line = '\n{}\n'.format(line)
                 break
+
+        if '```' in line:
+            index, line = get_code_string_from_doc(file, index)
 
         docstring_lines.append(line)
         index += 1

@@ -4,8 +4,8 @@ import logging
 import sys
 
 
-SRC_FOLDER = ''  # name to folder where src is saved
-SAVE_FOLDER = '../docs'  # name to folder where .md are going to be generated
+SRC_FOLDER = 'example'  # name to folder where src is saved
+SAVE_FOLDER = 'docs'  # name to folder where .md are going to be generated
 DEFAULT_INDENTATION = 4
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -58,10 +58,16 @@ def get_code_string_from_doc(file, index):
     {
         "url": "htpps://www.github.com/"
     }
+    ```
 
     Args:
         file: List. All
-    ```
+        index: int. Index of line where starts code tag
+
+    Returns:
+        Tuple(int, string):
+            * index where ends code tag.
+            * string with code as markdown
     """
     code_delimiter = '```'
     line = file[index]
@@ -105,9 +111,9 @@ def get_object_doc(file, index):
         line = file[index].strip() + '\n'
         cont_delimiters += line.count(docstring_delimiter)
 
-        subtitles = ['**Args**', '**Returns**', '**Yields**', '**Attributes**', '**Raises**']
+        subtitles = ['Args:', 'Returns:', 'Yields:', 'Attributes:', 'Raises:']
         for sub in subtitles:
-            if sub in line or sub.replace('s**', 's:**') in line:
+            if sub in line:
                 line = '\n{}\n'.format(line)
                 break
 

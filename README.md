@@ -1,45 +1,50 @@
 # Generate makdown from .py files
 
-Script para gerar markdown dos arquivos python.
+Script to generate makdown files from python files.
 
 ## How to use
 
-Cole o arquivo `generate.py` **na raiz** do projeto e altere as variáveis seguintes variáveis globais:
+Paste file `generate.py` on project's **src folder** and change the following global variables:
 
-- `SRC_FOLDER`: pasta com os arquivos python que deseja gerar os arquivos `.md`
-- `SAVE_FOLDER`: pasta destino onde será salvo os arquivos `.md` de cada arquivo python
-- `DEFAULT_INDENTATION`: número padrão de espaços utilizados na indentação dos arquivos `.py`
+- `SRC_FOLDER`: folder with target files to generate `.md` files. Use blank string `""` if wants folder the script is pasted.
+- `SAVE_FOLDER`: folder target to save generated `.md` files.
+- `DEFAULT_INDENTATION`: Integer with number of spaces used to indent python on `.py` files.
 
-Após alterar as variáveis, execute o arquivo com o comando `python3 generate.py`.
+After changed, run the script from terminal command:
+
+```bash
+python3 generate.py
+```
 
 ### How it works
 
-O script generate vai fazer o markdown de todos os arquivos dentro da pasta e sub pastas e gerará os arquivos `.md` com a mesma estrutura de diretório.
+The script _generate_ will create the markdown files from all python files inside the folder and sub folders. The Output folder
+will have with same structure as the folder target with python files.
 
-Ex:
+i.e:
 
-Considere estrutura de diretório:
+Look ate the directory structure:
 ```
 - core
-   - arquivo.py
-   - testes
-        - test1.py
+   - file.py
+   - tests
+        - test_1.py
 ```
 
-A saída será:
+The Otput will be:
 
 ```       
 - core
-   - arquivo.md
-   - testes
-        - test1.md
+   - file.md
+   - test
+        - test_1.md
 ```
 
 ### List of Arguments
-É possível passar argumentos para o script
+It is possible to give some arguments to script
 
-Arg   | Explicação
+Arg   | Explanation
 --------- | ------
--v | mostra os loggs de warning
--vv | mostra os loggs de warning e info
--vvv | mostra os loggs todos os loggs: warning, info de debug
+-v | show warning loggs
+-vv | show warning and info loggs
+-vvv | show all loggs: warning, info de debug

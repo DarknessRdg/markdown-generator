@@ -1,134 +1,95 @@
 ### ContatoSerializer(serializers.ModelSerializer)
-Classe para tratar dos dados de um, ou vários Contatos da API
+Class to handle data from Contact.
 
 ### EnderecoSerializer(serializers.ModelSerializer)
-Classe para tratar dos dados de um, ou vários Enderecos da API
+Cass to handle data from a Address.
 
 ### UsuarioSerializer(serializers.ModelSerializer)
-Classe para tratar dos dados de um, ou vários Usuário da API
+Class to handle Users data.
 
 ### UsuarioSerializer._calcular_cpf(cpf)
-Metodo para calcular e validar os digitos do CPF
+Perform CPF calc and valitdarion.
 
+**Args**:
+- `cpf`: String com o CPF
 
-Args:
-
-cpf: String com o CPF
-
-
-Returns:
-
-True if cpf é um cpf válido, de acordo com os calculos,
-False if cpf não for válidos.
+**Returns**:
+- `True` Given CPF is valid one according to math calc.
+- `False`: Given CPF is not valid one.
 
 
 ### UsuarioSerializer._calcular_cpf.calc_primeiro()
-Verifica se o primeiro digito do CPF está certo
+Verify if first digit is correct.
 
-
-Returns:
-
-validacão: True ou False representando se o primeiro digito
-é igual ao esperado
-
-valor_esperado: int com o resultado calculado para o
-primeiro digito ser valido
+**Returns**:
+- `Tuple(bool, int)`: Bool that Determinate if first digit is valid, expected match number.
 
 
 ### UsuarioSerializer._calcular_cpf.calc_segundo(primeiro_digito)
-Verifica se o segundo digito do CPF está certo
+Verify if second digit is correct.
 
-
-Returns:
-
-validacão: True ou False representando se o segundo digito
-é igual ao esperado
-
-calculo: int com o resultado calculado somatorio(digito * multiplicador)
-dos digitos do cpf
+**Returns**:
+- `Tuple(bool, int)`: Bool that Determinate if second digit is valid, expected match number.
 
 
 ### UsuarioSerializer._save_contatos(contatos, usuario)
-Insere no banco de dados os contatos presente em uma lista de contatos.
+Save on database all contact instances present on a list.
 
-Caso contenha o campo `id`:
-* se existir no banco, o contato é atualizado;
-* se não existir no banco é criado um novo contato com o id passado.
+If field `id` is present:
+* if instance with given id is present on database, it is updated;
+* else instance is created with given id;
 
-Caso contrário é criado um novo contato.
-
-
-Args:
-
-contatos: lista de dicionario com os campos necessarios para
-salvar um endereco.
-usuario: objeto da classe Usuario de api_login.Models para ser
-usado na chave estrangeira.
+**Args**:
+- `contatos`: List() with data to save a contact number.
+- `usuario`: model Usuario instance to be related to the contact.
 
 
 ### UsuarioSerializer._save_enderecos(enderecos, usuario)
-Insere no banco de dados os enderecos presente em uma lista de enderecos.
+Save on database all contact instances address on a list.
 
-Caso contenha o campo `id`:
-* se existir no banco, o endereco é atualizado;
-* se não existir no banco é criado um novo endereco com o id passado.
+If field `id` is present:
+* if instance with given id is present on database, it is updated;
+* else instance is created with given id;
 
-Caso contrário é criado um novo endereco.
-
-
-Args:
-
-enderecos: lista de dicionario com os campos necessarios para
-salvar um endereco.
-usuario: objeto da classe Usuario de api_login.Models para ser
-usado na chave estrangeira.
+**Args**:
+- `enderecos`: List() with data to save a address.
+- `usuario`: model Usuario instance to be related to the contact.
 
 
 ### UsuarioSerializer.create(validated_data)
- Método chamado pelo método save() quando o Serializer não
-possui uma instância de um api_usuario.models.Usuario (self.instace == None).
+Custom create method to handle nested users data to be created as
+Address and Phone Number.
 
-Dessa forma, sua função é salvar no banco de dados os dados
-passados para o Serializer
-
-
-Args:
-
-validated_data: dicionário com os campos de um Usuario, Contatos e Enderecos pré-validados
+**Args**:
+- `validated_data`: Dict with data field pre validated from Usuario, Contatos e Enderecos models.
+**Returns**:
+- new `User` instance just saved.
 
 
 ### UsuarioSerializer.to_internal_value(data)
-Metodo para limpar dados que podem chegar com caracteres especiais
-como: CPF, CEP, número de telefone.
+Clean data that may have special characters like: CPF, CEP, Phone Number.
 
+**Args**:
+- `data`: dados enviados.
 
-Args:
-
-data: dados enviados
-
-Return:
-novo UsuarioSerializer com os dados limpos, sem possiveis caracteres especiais
+**Return**:
+- `Dict`: UsuarioSerializer with cleaned data.
 
 
 ### UsuarioSerializer.update(instance, validated_data)
- Método chamado pelo método save() quando o Serializer possui
-uma instância de um api_usuario.models.Usuario (self.instace == Usuario()).
+Custom updated method to handle nested users data to be updated, such as
+Address and Phone Number
 
-Dessa forma, sua função é atualizar o usuario no banco de dados
-com os dados passados para o Serializer
-
-
-Args:
-
-validated_data: dicionário com os campos de um Usuario, Contatos e Enderecos pré-validados
+**Args**:
+- `validated_data`: Dict with data field pre validated from Usuario, Contatos e Enderecos models.
+**Returns**:
+- new `User` instance just updated.
 
 
 ### UsuarioSerializer.validate_cpf(cpf)
-Metodo com todas as validacões de um CPF.
+Custom to calculate CPF digits and verify if it's a valid CPF.
 
-
-Args:
-
+**Args**:
 cpf: String com o CPF
 
 

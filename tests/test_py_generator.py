@@ -16,3 +16,12 @@ def test_is_python_file():
     for file in python_files:
         assert generate.is_python_file(file), f'{file} should be treated as a python file.'
 
+
+def test_clean_object_name():
+    assert generate.clean_object_name('class MyClass:') == 'MyClass'
+    assert generate.clean_object_name('class MyClass(OtherClass):') == 'MyClass(OtherClass)'
+
+    assert generate.clean_object_name('def _my_method():') == '_my_method()'
+    assert generate.clean_object_name('def _my_method(self):') == '_my_method()'
+    assert generate.clean_object_name('def method(self, *args):') == 'method(*args)'
+    assert generate.clean_object_name('def method(self, *args, **kwargs):') == 'method(*args, **kwargs)'

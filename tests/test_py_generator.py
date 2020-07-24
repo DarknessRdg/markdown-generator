@@ -25,3 +25,15 @@ def test_clean_object_name():
     assert generate.clean_object_name('def _my_method(self):') == '_my_method()'
     assert generate.clean_object_name('def method(self, *args):') == 'method(*args)'
     assert generate.clean_object_name('def method(self, *args, **kwargs):') == 'method(*args, **kwargs)'
+
+
+def test_get_indent():
+    indent = generate.DEFAULT_INDENTATION
+    assert generate.get_indent(' ' * (0*indent)) == 0
+    assert generate.get_indent(' ' * (1*indent)) == 1
+    assert generate.get_indent(' ' * (2*indent)) == 2
+    assert generate.get_indent(' ' * (3*indent)) == 3
+    assert generate.get_indent(' ' * (4*indent)) == 4
+    assert generate.get_indent(' ' * (100*indent)) == 100
+    assert generate.get_indent('    def class(): {}'.format(' ' * 100)) == 1
+    assert generate.get_indent('    class X() {}'.format(' ' * 100)) == 1

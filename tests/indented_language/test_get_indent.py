@@ -58,31 +58,27 @@ def file():
 
 
 def test_happy_function(file):
-    assert get_indent(file, FUNCTION) == 0
+    assert get_indent(file, FUNCTION) == 4
 
 
 def test_nested_function(file):
-    assert get_indent(file, FUNCTION_NESTED) == 0
-    assert get_indent(file, FUNCTION_NESTED_CHILD) == 1
+    assert get_indent(file, FUNCTION_NESTED) == 4
+    assert get_indent(file, FUNCTION_NESTED_CHILD) == 8
 
 
 def test_when_function_has_empty_spaces_before_starts_the_code(file):
-    assert get_indent(file, FUNCTION_WITH_DOCS_SPACE) == 0
+    assert get_indent(file, FUNCTION_WITH_DOCS_SPACE) == 4
 
 
 def test_class_indent(file):
-    assert get_indent(file, CLASS) == 0
-    assert get_indent(file, CLASS_META) == 1
+    assert get_indent(file, CLASS) == 4
+    assert get_indent(file, CLASS_META) == 8
 
 
 def test_class_method(file):
-    assert get_indent(file, CLASS_METHOD_1) == 1
+    assert get_indent(file, CLASS_METHOD_1) == 8
 
 
 def test_class_method_with_nested_function(file):
-    assert get_indent(file, CLASS_METHOD_NESTED) == 1
-    assert get_indent(file, CLASS_METHOD_NESTED_CHILD) == 2
-
-
-def test_get_ident_with_non_default_ident_size(file):
-    assert get_indent(file, FUNCTION, indent=1) == 3
+    assert get_indent(file, CLASS_METHOD_NESTED) == 8
+    assert get_indent(file, CLASS_METHOD_NESTED_CHILD) == 12

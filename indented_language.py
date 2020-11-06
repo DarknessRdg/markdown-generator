@@ -30,6 +30,9 @@ IGNORE_FILES_NAME = [
     r'^_.*',  # private files
 ]
 
+# Docstring delimiter
+DOCSTRING = '"""'
+
 
 def is_file(file_name, extension=FILE_EXTENSION):
     parts = file_name.split('.')
@@ -55,8 +58,8 @@ def is_allowed_files(file_name, ignore=None):
     return True
 
 
-def get_indent(file, index, indent=INDENT):
-    index += 1
+def get_indent(file, function_index, indent=INDENT):
+    index = function_index + 1
 
     while not file[index].strip():
         index += 1
@@ -67,3 +70,25 @@ def get_indent(file, index, indent=INDENT):
     while line[count_white_spaces] == ' ':
         count_white_spaces += 1
     return count_white_spaces // indent - 1
+
+
+def get_docstring_range(file, function_index):
+    index = function_index + 1
+
+    while not file[index].strip():
+        index += 1
+
+    line = file[index]
+
+    if not line.strip().startswith(DOCSTRING):
+        return range(0)
+
+    count = line.count(DOCSTRING)
+    start, end = index, index
+    while count == 1:
+        index += 1
+        line = file[index]
+        count += line.count(DOCSTRING)
+        end = index
+
+    return range(start, end+1)

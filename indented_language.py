@@ -55,7 +55,7 @@ def is_allowed_files(file_name, ignore=None):
     return True
 
 
-def get_indent(file, index):
+def get_indent(file, index, indent=INDENT):
     index += 1
 
     while not file[index].strip():
@@ -66,4 +66,4 @@ def get_indent(file, index):
     count_white_spaces = 0
     while line[count_white_spaces] == ' ':
         count_white_spaces += 1
-    return count_white_spaces
+    return count_white_spaces // indent - 1

@@ -58,7 +58,7 @@ def is_allowed_files(file_name, ignore=None):
     return True
 
 
-def get_indent(file, function_index, indent=INDENT):
+def get_indent(file, function_index):
     index = function_index + 1
 
     while not file[index].strip():
@@ -69,7 +69,7 @@ def get_indent(file, function_index, indent=INDENT):
     count_white_spaces = 0
     while line[count_white_spaces] == ' ':
         count_white_spaces += 1
-    return count_white_spaces // indent - 1
+    return count_white_spaces
 
 
 def get_docstring_range(file, function_index):
@@ -92,3 +92,18 @@ def get_docstring_range(file, function_index):
         end = index
 
     return range(start, end+1)
+
+
+def get_docstring(file, function_index):
+    docs = []
+    indented_spaces = get_indent(file, function_index)
+
+    for index in get_docstring_range(file, function_index):
+        line = file[index]
+        line = line[indented_spaces:]
+        line = line.replace(DOCSTRING, '')
+
+        if line:
+            docs.append(line)
+
+    return '\n'.join(docs) + '\n'

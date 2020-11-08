@@ -1,6 +1,6 @@
 import pytest
 
-from indented_language import get_docstring
+from indented_language import get_object_docstring
 
 
 FILE = '''
@@ -32,10 +32,11 @@ def file(mocker):
 
 
 def test_returns_docs_without_white_space(file):
-    docs = get_docstring(file, FUNCTION)
+    docs = get_object_docstring(file, FUNCTION)
     assert docs == '''Returns:\n    - `None`: ...\n'''
 
 
 def test_do_not_remove_extra_spaces(file):
     expected = '        This is my cods\n'
-    assert get_docstring(file, FUNCTION_WITH_MANY_BLANK_SPACES) == expected
+    actual = get_object_docstring(file, FUNCTION_WITH_MANY_BLANK_SPACES)
+    assert actual == expected

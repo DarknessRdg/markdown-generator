@@ -126,7 +126,7 @@ def get_docstring_range(file, function_index):
     return range(start, end+1)
 
 
-def get_docstring(file, function_index):
+def get_object_docstring(file, function_index):
     docs = []
     indented_spaces = get_indent(file, function_index)
 

@@ -1,3 +1,4 @@
+import contextlib
 import os
 import re
 
@@ -32,6 +33,37 @@ IGNORE_FILES_NAME = [
 
 # Docstring delimiter
 DOCSTRING = '"""'
+
+
+def clear_line(line):
+    """
+    Change this function in order to perform extra customization
+    on line that you want it to appear on the markdown.
+
+    Args:
+        line: String that is the current line in the file being processed
+            at the moment. This line can be changed as you wish.
+
+    Returns:
+        String: The new string processed to replace older string.
+    """
+    line = clear_docstring_keywords(line)
+    return line
+
+
+def clear_docstring_keywords(line):
+    def black(word):
+        return '\n**%s**\n\n' % word
+
+    keywords = {
+        'Args:': black,
+        'Returns:': black,
+        'Raises:': black
+    }
+    with contextlib.suppress(KeyError):
+        parser = keywords[line]
+        return parser(line)
+    return line
 
 
 def is_file(file_name, extension=FILE_EXTENSION):
@@ -102,6 +134,10 @@ def get_docstring(file, function_index):
         line = file[index]
         line = line[indented_spaces:]
         line = line.replace(DOCSTRING, '')
+
+        # parse line as user wishes.
+        # Read `clear_line` docstring to understand how to use it
+        line = clear_line(line)
 
         if line:
             docs.append(line)

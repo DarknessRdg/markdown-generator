@@ -20,8 +20,12 @@ FUNCTION = 0
 FUNCTION_WITH_MANY_BLANK_SPACES = 6
 
 
-@pytest.fixture(scope='module')
-def file():
+@pytest.fixture
+def file(mocker):
+    def mock_fun(line):
+        return line
+    mocker.patch('indented_language.clear_docstring_keywords', mock_fun)
+
     split = FILE.split('\n')
     split.pop(0)
     return split

@@ -66,6 +66,87 @@ def clear_docstring_keywords(line):
     return line
 
 
+class TypeOfObject:
+    CLASS = 1
+    METHOD = 2
+    FUNCTION = 3
+
+
+class Object(object):
+    def __init__(self, line, parent=None):
+        line = line.strip()
+        self.parent = parent
+
+        self.token = self._get_token(line)
+        self._name = self._get_name(line)
+
+    def _get_token(self, line):
+        return line.split()[0]
+
+    def _get_name(self, line):
+        end = len(line) - 1
+        start = line.index(' ') + 1
+
+        end_token = ')' if ')' in line else ':'
+        while line[end] != end_token and end >= 0:
+            end -= 1
+
+        if end == -1:
+            end = len(line) - 1
+
+        line = line[start:end+1]
+        if self.type == TypeOfObject.METHOD:
+            with contextlib.suppress(ValueError):
+                _self = 'self'
+                self_start = line.index(_self)
+                self_end = self_start + len(_self)
+
+                while self_start > 0 and line[self_start-1] == ' ':
+                    self_start -= 1
+                while self_end < len(line)-1 and line[self_end+1] in (',', ' '):
+                    self_end += 1
+
+                line = list(line)
+                for index in range(self_start, self_end+1):
+                    line.pop(self_start)
+                line = ''.join(line)
+
+        return line
+
+    @property
+    def type(self):
+        if self.token == 'class':
+            return TypeOfObject.CLASS
+        else:
+            parent = self.parent
+            while parent is not None and parent.token != 'class':
+                parent = parent.parent
+
+            if parent is not None:
+                return TypeOfObject.METHOD
+            return TypeOfObject.FUNCTION
+
+    @property
+    def name(self):
+        parent_name = ''
+        if self.parent:
+            parent_name = self.parent.name
+
+            parent_name = parent_name.split('.')
+            for index in range(len(parent_name)):
+                _name = parent_name[index]
+                with contextlib.suppress(ValueError):
+                    _name = _name[:_name.index('(')]
+                    parent_name[index] = _name
+
+            parent_name = '.'.join(parent_name) + '.'
+
+        return parent_name + self._name
+
+    def __str__(self):
+        return '%s %s' % (self.token, self.name)
+
+
 def is_file(file_name, extension=FILE_EXTENSION):
     parts = file_name.split('.')
     if len(parts) == 2:

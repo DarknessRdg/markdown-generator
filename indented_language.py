@@ -34,6 +34,13 @@ IGNORE_FILES_NAME = [
 # Docstring delimiter
 DOCSTRING = '"""'
 
+# Language reserved word that can have a docstring
+# like class, function or method
+LANGUAGE_KEYWORDS = [
+    'class',
+    'def',
+]
+
 
 def clear_line(line):
     """
@@ -73,9 +80,10 @@ class TypeOfObject:
 
 
 class Object(object):
-    def __init__(self, line, parent=None):
+    def __init__(self, line, docstring, parent=None):
         line = line.strip()
         self.parent = parent
+        self.docstring = docstring
 
         self.token = self._get_token(line)
         self._name = self._get_name(line)
@@ -224,3 +232,20 @@ def get_object_docstring(file, function_index):
             docs.append(line)
 
     return '\n'.join(docs) + '\n'
+
+
+def get_docstring(file):
+    index = 0
+
+    docs = []
+    while index < len(file):
+        line = file[index]
+
+        has_docs = any([
+            line.strip().startswith(token) for token in LANGUAGE_KEYWORDS
+        ])
+
+        if has_docs:
+            docs.append(get_object_docstring(file, index))
+            index = get_docstring_range(file, index).stop
+        index += 1

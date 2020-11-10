@@ -5,14 +5,14 @@ from indented_language import Object, TypeOfObject
 
 @pytest.fixture
 def instance_with_parent():
-    grandparent = Object('class GrandParent')
-    parent = Object('def parent(self)', grandparent)
-    return Object('def child()', parent)
+    grandparent = Object('class GrandParent', '')
+    parent = Object('def parent(self)', '', grandparent)
+    return Object('def child()', '', parent)
 
 
 @pytest.fixture
 def instance():
-    return Object('def function()')
+    return Object('def function()', '')
 
 
 def test_token(instance_with_parent):
@@ -47,19 +47,20 @@ class TestPropertyName:
         assert instance_with_parent.name == expected
 
     def test_name_not_include_self(self):
-        clazz = Object('class MyClass')
+        clazz = Object('class MyClass', '')
+        args = '', clazz
         expected = 'MyClass.method(arg1, arg2)'
 
-        instance = Object('def method(self, arg1, arg2)', clazz)
+        instance = Object('def method(self, arg1, arg2)', *args)
         assert instance.name == expected
 
-        instance = Object('def method(self , arg1, arg2)', clazz)
+        instance = Object('def method(self , arg1, arg2)', *args)
         assert instance.name == expected
 
-        instance = Object('def method(   self, arg1, arg2)', clazz)
+        instance = Object('def method(   self, arg1, arg2)', *args)
         assert instance.name == expected
 
-        instance = Object('def method(   self  , arg1, arg2)', clazz)
+        instance = Object('def method(   self  , arg1, arg2)', *args)
         assert instance.name == expected
 
 

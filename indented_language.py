@@ -80,10 +80,11 @@ class TypeOfObject:
 
 
 class Object(object):
-    def __init__(self, line, docstring, parent=None):
+    def __init__(self, line, docstring, parent=None, indent=0):
         line = line.strip()
         self.parent = parent
         self.docstring = docstring
+        self.indent = indent
 
         self.token = self._get_token(line)
         self._name = self._get_name(line)
@@ -153,6 +154,16 @@ class Object(object):
 
     def __str__(self):
         return '%s %s' % (self.token, self.name)
+
+    def __eq__(self, other):
+        if isinstance(other, Object):
+            _self = self.parent, self.name
+            other = other.parent, other.name
+            return _self == other
+        return False
+
+    def __repr__(self):
+        return '<Object %s>' % self.name
 
 
 def is_file(file_name, extension=FILE_EXTENSION):
@@ -234,10 +245,10 @@ def get_object_docstring(file, function_index):
     return '\n'.join(docs) + '\n'
 
 
-def get_docstring(file):
-    index = 0
+def get_docstring_objects(file, index=0, parent=None):
+    objects = []
+    last_indent = 0 if parent is None else parent.indent
 
-    docs = []
     while index < len(file):
         line = file[index]
 
@@ -246,6 +257,26 @@ def get_docstring(file):
         ])
 
         if has_docs:
-            docs.append(get_object_docstring(file, index))
+            indent = get_indent(file, index)
+
+            docs = get_object_docstring(file, index)
             index = get_docstring_range(file, index).stop
+
+            while indent <= last_indent and parent is not None:
+                parent = parent.parent
+                if parent:
+                    last_indent = parent.indent
+
+            obj = Object(line, docs, parent, indent)
+            objects.append(obj)
+
+            if indent > last_indent:
+                last_indent = indent
+                nested_objects, index = get_docstring_objects(file, index, obj)
+                objects += nested_objects
+            elif indent < last_indent:
+                return objects, index
+
         index += 1
+
+    return objects, index

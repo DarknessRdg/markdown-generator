@@ -93,17 +93,17 @@ class Object(object):
         return line.split()[0]
 
     def _get_name(self, line):
-        end = len(line) - 1
+        end = len(line)
         start = line.index(' ') + 1
 
-        end_token = ')' if ')' in line else ':'
-        while line[end] != end_token and end >= 0:
-            end -= 1
+        with contextlib.suppress(ValueError):
+            end_token = ')' if ')' in line else ':'
+            end = line.index(end_token)
 
-        if end == -1:
-            end = len(line) - 1
+            if end_token == ')':
+                end += 1
 
-        line = line[start:end+1]
+        line = line[start:end]
         if self.type == TypeOfObject.METHOD:
             with contextlib.suppress(ValueError):
                 _self = 'self'

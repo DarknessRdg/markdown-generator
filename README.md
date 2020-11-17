@@ -2,6 +2,7 @@
 
 Script to generate makdown files from python files.
 
+
 ## How to use
 
 Paste file `generate.py` on project's **src folder** and change the following global variables:

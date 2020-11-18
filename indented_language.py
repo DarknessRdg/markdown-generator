@@ -284,9 +284,21 @@ def get_docstring_objects(file, index=0, parent=None):
                 last_indent = indent
                 nested_objects, index = get_docstring_objects(file, index, obj)
                 objects += nested_objects
+
+                if not nested_objects:  # roll back to current line
+                    index -= 1
             elif indent < last_indent:
                 return objects, index
 
         index += 1
 
     return objects, index
+
+
+def objects_to_markdown(objects) -> str:
+    md_lines = []
+    for obj in objects:
+        if obj.docstring:
+            md_lines.append(f'{obj}\n')
+            md_lines.append(obj.docstring)
+    return '\n'.join(md_lines)

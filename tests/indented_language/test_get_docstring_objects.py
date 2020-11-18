@@ -1,7 +1,7 @@
 import pytest
 
 from indented_language import get_docstring_objects, Object
-
+from tests.indented_language.utils import get_file
 
 FILE = '''
 class MyClass:
@@ -22,9 +22,7 @@ def other_fun():
 
 @pytest.fixture
 def file():
-    split = FILE.split('\n')
-    split.pop(0)
-    return split
+    return get_file(FILE)
 
 
 @pytest.fixture

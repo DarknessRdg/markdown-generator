@@ -263,8 +263,15 @@ def get_docstring_objects(file, index=0, parent=None):
             indent = get_indent(file, index)
 
             docs = get_object_docstring(file, index)
-            index = get_docstring_range(file, index).stop
+            docs_range = get_docstring_range(file, index)
 
+            function_name = [
+                file[i].strip()
+                for i in range(index+1, docs_range.start)
+            ]
+            line += ' '.join(function_name)
+
+            index = docs_range.stop
             while indent <= last_indent and parent is not None:
                 parent = parent.parent
                 if parent:

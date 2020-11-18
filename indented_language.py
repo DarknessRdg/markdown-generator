@@ -205,6 +205,9 @@ def get_indent(file, function_index):
 
 
 def get_docstring_range(file, function_index):
+    while not file[function_index].strip().endswith(':'):
+        function_index += 1
+
     index = function_index + 1
 
     while not file[index].strip():

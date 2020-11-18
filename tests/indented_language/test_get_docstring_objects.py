@@ -53,14 +53,14 @@ def other_function():
 
 
 def test_single_function():
-    file = ['def function()', '"""docs"""']
+    file = ['def function():', '"""docs"""']
     assert get_docstring_objects(file, 0)[0] == [
         Object('def function()', 'docs')
     ]
 
 
 def test_many_functions():
-    file = ['def function()', '"""docs"""', ''] * 3
+    file = ['def function():', '"""docs"""', ''] * 3
     objects = [Object('def function()', 'docs')] * 3
 
     assert get_docstring_objects(file, 0)[0] == objects
@@ -70,4 +70,30 @@ def test_nested_functions(file, clazz, method, function, other_function,
                           method_2):
     assert get_docstring_objects(file, 0)[0] == [
         clazz, method, function, method_2, other_function
+    ]
+
+
+FUNCTION_MANY_ARGS = '''
+def function(
+    arg1: Int,
+    arg2: Empty = Empty(), 
+    arg3
+):
+    """
+    here is my docs
+    """
+'''
+
+
+def test_get_function_that_has_more_than_one_line_parameters():
+    file = get_file(FUNCTION_MANY_ARGS)
+
+    doc_object, index = get_docstring_objects(file, 0)
+
+    assert index == len(file)
+    assert doc_object == [
+        Object(
+            'def function(arg1: Int, arg2: Empty = Empty(), arg3 ):',
+            'here is my docs'
+        )
     ]

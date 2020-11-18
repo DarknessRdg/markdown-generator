@@ -25,6 +25,14 @@ def non_docs():
 
 def other():
     pass
+
+
+def multiple_lines(
+    args1: int,
+arg2=Empty(),
+        arg2
+):
+    """docs multiple line"""
 '''
 
 
@@ -32,6 +40,7 @@ FUNCTION = 0
 INLINE_DOCS = 7
 UGLY_DOCS = 11
 NON_DOCS = 16
+MULTIPLE_LINES = 23
 
 
 @pytest.fixture(scope='module')
@@ -60,3 +69,8 @@ def test_non_standardized_docs(file):
 
 def test_non_docs(file):
     assert get_docstring_range(file, NON_DOCS) == range(0)
+
+
+def test_function_with_multiple_args(file):
+    start = MULTIPLE_LINES + 5
+    assert get_docstring_range(file, MULTIPLE_LINES) == range(start, start+1)

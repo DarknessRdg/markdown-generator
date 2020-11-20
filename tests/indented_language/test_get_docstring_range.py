@@ -83,11 +83,13 @@ def test_non_standardized_docs(file):
 
 
 def test_non_docs(file):
-    docs_range = get_docstring_range(file, NON_DOCS)
-    expected_range = range(0)
+    index = NON_DOCS
 
-    assert docs_range.start == expected_range.start
-    assert docs_range.stop == expected_range.stop
+    docs_range = get_docstring_range(file, index)
+
+    assert docs_range.start == index+1
+    assert docs_range.stop == index+1
+    assert docs_range == range(0)
 
 
 def test_function_with_multiple_args(file):

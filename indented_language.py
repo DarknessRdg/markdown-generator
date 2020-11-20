@@ -225,7 +225,7 @@ def get_docstring_range(file, function_index):
     line = file[index]
 
     if not line.strip().startswith(DOCSTRING):
-        return range(0)
+        return range(function_index+1, function_index+1)
 
     count = line.count(DOCSTRING)
     start, end = index, index

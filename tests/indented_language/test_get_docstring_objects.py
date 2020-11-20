@@ -7,6 +7,9 @@ FILE = '''
 class MyClass:
     """class"""
 
+    class Meta:
+        pass
+
     def method(self):
         """method"""
 
@@ -28,6 +31,11 @@ def file():
 @pytest.fixture
 def clazz():
     return Object('class MyClass:', 'class')
+
+
+@pytest.fixture
+def clazz_meta(clazz):
+    return Object('class Meta:', '', clazz)
 
 
 @pytest.fixture
@@ -64,10 +72,10 @@ def test_many_functions():
     assert get_docstring_objects(file, 0)[0] == objects
 
 
-def test_nested_functions(file, clazz, method, function, other_function,
-                          method_2):
+def test_nested_functions(file, clazz, clazz_meta, method, function,
+                          other_function, method_2):
     assert get_docstring_objects(file, 0)[0] == [
-        clazz, method, function, method_2, other_function
+        clazz, clazz_meta, method, function, method_2, other_function
     ]
 
 

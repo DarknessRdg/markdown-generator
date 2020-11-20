@@ -184,10 +184,19 @@ def is_allowed_files(file_name, ignore=None):
     file_name, _ = file_name.split('.')
 
     for regex in map(re.compile, ignore):
-        print(regex)
         if regex.match(file_name):
             return False
     return True
+
+
+def is_allowed_folder(folder_name, ignore=None):
+    if ignore is None:
+        ignore = IGNORE_FOLDERS
+
+    return all([
+        not regex.match(folder_name)
+        for regex in map(re.compile, ignore)
+    ])
 
 
 def get_indent(file, function_index):

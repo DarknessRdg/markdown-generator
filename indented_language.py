@@ -7,11 +7,11 @@ import sys
 
 # Relative path to BASE_DIR where code to be
 # generated are stored
-SRC_FOLDER = ''
+SRC_FOLDER = 'example'
 
 # Relative path to BASE_DIR where all output `.md` files
 # should be created
-SAVE_FOLDER = ''
+SAVE_FOLDER = 'docs'
 
 # Default number of spaces used to ident code
 INDENT = 4

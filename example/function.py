@@ -12,7 +12,7 @@ def get_started():
     It is very simple, just place your docstring as a markdown text and you're
     ready yo go.
 
-    **Returns:**
+    Returns:
         A great experience!!
     """
     return

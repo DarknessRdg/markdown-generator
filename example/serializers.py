@@ -33,10 +33,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         """Clean data that may have special characters like: CPF, CEP, Phone Number.
 
-        **Args**:
+        Args:
              - `data`: dados enviados.
 
-       **Return**:
+       Return:
             - `Dict`: UsuarioSerializer with cleaned data.
         """
         if 'cpf' in data.keys():
@@ -58,9 +58,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
         """Custom create method to handle nested users data to be created as
         Address and Phone Number.
 
-        **Args**:
+        Args:
             - `validated_data`: Dict with data field pre validated from Usuario, Contatos e Enderecos models.
-        **Returns**:
+        Returns:
             - new `User` instance just saved.
         """
         contatos, enderecos = [], []
@@ -80,9 +80,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
         """Custom updated method to handle nested users data to be updated, such as
         Address and Phone Number
 
-        **Args**:
+        Args:
             - `validated_data`: Dict with data field pre validated from Usuario, Contatos e Enderecos models.
-        **Returns**:
+        Returns:
             - new `User` instance just updated.
         """
         contatos, enderecos = [], []
@@ -106,7 +106,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def validate_cpf(self, cpf):
         """Custom to calculate CPF digits and verify if it's a valid CPF.
 
-        **Args**:
+        Args:
             cpf: String com o CPF
 
         Returns:
@@ -131,10 +131,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def _calcular_cpf(self, cpf):
         """Perform CPF calc and valitdarion.
 
-        **Args**:
+        Args:
             - `cpf`: String com o CPF
 
-        **Returns**:
+        Returns:
             - `True` Given CPF is valid one according to math calc.
             - `False`: Given CPF is not valid one.
         """
@@ -165,7 +165,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         def calc_segundo(primeiro_digito):
             """Verify if second digit is correct.
 
-            **Returns**:
+            Returns:
                 - `Tuple(bool, int)`: Bool that Determinate if second digit is valid, expected match number.
             """
             multiplicador = 11
@@ -195,7 +195,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             * if instance with given id is present on database, it is updated;
             * else instance is created with given id;
 
-        **Args**:
+        Args:
             - `contatos`: List() with data to save a contact number.
             - `usuario`: model Usuario instance to be related to the contact.
         """
@@ -218,7 +218,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             * if instance with given id is present on database, it is updated;
             * else instance is created with given id;
 
-        **Args**:
+        Args:
             - `enderecos`: List() with data to save a address.
             - `usuario`: model Usuario instance to be related to the contact.
         """

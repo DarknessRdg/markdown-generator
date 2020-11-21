@@ -70,8 +70,8 @@ class TestPropertyName:
 
 class TestStr:
     def test_without_parent(self, instance):
-        assert str(instance) == 'def function()'
+        assert str(instance) == '### def function()'
 
     def test_with_parent(self, instance_with_parent):
-        expected = 'def GrandParent.parent.child()'
+        expected = '### def GrandParent.parent.child()'
         assert str(instance_with_parent) == expected

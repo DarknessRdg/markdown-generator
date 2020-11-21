@@ -153,7 +153,7 @@ class Object(object):
         return parent_name + self._name
 
     def __str__(self):
-        return '%s %s' % (self.token, self.name)
+        return '### %s %s' % (self.token, self.name)
 
     def __eq__(self, other):
         if isinstance(other, Object):

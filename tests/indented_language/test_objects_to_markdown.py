@@ -16,7 +16,7 @@ def test_return_empty_string_when_empty_list():
 def test_double_linebreaks_between_name_and_docs():
     objects = [Object('def function():', 'my docs')]
     assert objects_to_markdown(objects) == (
-        'def function()\n\n'
+        '### def function()\n\n'
         'my docs'
     )
 
@@ -27,8 +27,8 @@ def test_join_all_lines_with_single_linebreak():
         Object('class MyClass:', 'my class')
     ]
     assert objects_to_markdown(objects) == (
-        'def function()\n\n'
+        '### def function()\n\n'
         'my function docs\n'
-        'class MyClass\n\n'
+        '### class MyClass\n\n'
         'my class'
     )

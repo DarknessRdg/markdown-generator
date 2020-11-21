@@ -40,3 +40,9 @@ def test_do_not_remove_extra_spaces(file):
     expected = '        This is my cods\n'
     actual = get_object_docstring(file, FUNCTION_WITH_MANY_BLANK_SPACES)
     assert actual == expected
+
+
+def test_do_include_empty_lines():
+    file = ['def function():', '"""start here', '   ', 'ends here"""']
+    expected = 'start here\nends here\n'
+    assert get_object_docstring(file, 0) == expected

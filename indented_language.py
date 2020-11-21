@@ -251,7 +251,7 @@ def get_object_docstring(file, function_index):
         # Read `clear_line` docstring to understand how to use it
         line = clear_line(line)
 
-        if line:
+        if line.strip():
             docs.append(line)
 
     return '\n'.join(docs) + '\n'

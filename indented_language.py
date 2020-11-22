@@ -13,9 +13,6 @@ SRC_FOLDER = 'example'
 # should be created
 SAVE_FOLDER = 'docs'
 
-# Default number of spaces used to ident code
-INDENT = 4
-
 # Extension name of the file should be generated.
 # ATTENTION: Remember it must be an indented language extension
 FILE_EXTENSION = 'py'

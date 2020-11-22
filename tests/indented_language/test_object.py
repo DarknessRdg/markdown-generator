@@ -5,14 +5,14 @@ from indented_language import Object, TypeOfObject
 
 @pytest.fixture
 def instance_with_parent():
-    grandparent = Object('class GrandParent', '')
-    parent = Object('def parent(self)', '', grandparent)
-    return Object('def child()', '', parent)
+    grandparent = Object('class GrandParent:', '')
+    parent = Object('def parent(self):', '', grandparent)
+    return Object('def child():', '', parent)
 
 
 @pytest.fixture
 def instance():
-    return Object('def function()', '')
+    return Object('def function():', '')
 
 
 def test_token(instance_with_parent):
@@ -39,6 +39,10 @@ def test_type(instance, instance_with_parent):
 
 
 class TestPropertyName:
+    def test_when_name_dont_have_parenthesis_or_double_dot(self):
+        instance = Object('def function', '')
+        assert instance.name == 'function'
+
     def test_without_parent(self, instance):
         assert instance.name == 'function()'
 
@@ -47,7 +51,7 @@ class TestPropertyName:
         assert instance_with_parent.name == expected
 
     def test_name_not_include_self(self):
-        clazz = Object('class MyClass', '')
+        clazz = Object('class MyClass:', '')
         args = '', clazz
         expected = 'MyClass.method(arg1, arg2)'
 
@@ -66,8 +70,8 @@ class TestPropertyName:
 
 class TestStr:
     def test_without_parent(self, instance):
-        assert str(instance) == 'def function()'
+        assert str(instance) == '### def function()'
 
     def test_with_parent(self, instance_with_parent):
-        expected = 'def GrandParent.parent.child()'
+        expected = '### def GrandParent.parent.child()'
         assert str(instance_with_parent) == expected

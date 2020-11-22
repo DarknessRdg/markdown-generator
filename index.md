@@ -1,37 +1,81 @@
-## Welcome to GitHub Pages
+# Markdown Generator
 
-You can use the [editor on GitHub](https://github.com/DarknessRdg/markdown-generator/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+##### What is it?
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+This is a script that generates a markdown for you script files. It extracts the docstrings from your classes, functions, method and even from you file docstring.
 
-```markdown
-Syntax highlighted code block
+This module was designed to extract docstring from python scripts. But if you language the following rules to fit this script, than you are fine to use it:
 
-# Header 1
-## Header 2
-### Header 3
+1. Uses `(` and `)` to delimiter function declaration.
+2. Uses `:` do delimiter to start function os class indented scope (important one).
+3. Uses a single token to delimiter start and end of code docstring, in python: `"""` marks start and end of docstring.
+4. Is an indented based language
 
-- Bulleted
-- List
+##### How it works
 
-1. Numbered
-2. List
+This script will read your script file and look for all docstring in it.
 
-**Bold** and _Italic_ and `Code` text
+##### What is a docstring.
 
-[Link](url) and ![Image](src)
-```
+Well, it is all comment in your file code that has the purpose to document your function, class, method, or file. We call it `docstring` because in python we have an especial toke for string that is used with purpose to document.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Checkout the example bellow:
+```py
+def my_function():
+    """
+    This is an string in python,
+    But since it is just after function declaration,
+    then this is an escpecial string, this is a: docstring
+    """
+    pass
+``` 
 
-### Jekyll Themes
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/DarknessRdg/markdown-generator/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### Settings
 
-### Support or Contact
+Well, let's take a look at what settings you can do to customize de generation. All the settings are in the beginning of the script. When you get you copy, you will see your the following code:
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+```py
+SRC_FOLDER = 'example'
+
+SAVE_FOLDER = 'docs'
+
+FILE_EXTENSION = 'py'
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+IGNORE_FOLDERS = [
+
+]
+
+IGNORE_FILES_NAME = [
+    r'^__.*__$',  # python files
+    r'^_.*',  # private files
+]
+
+DOCSTRING = '"""'
+
+LANGUAGE_KEYWORDS = [
+    'class',
+    'def',
+]
+
+
+def clear_line(line):
+    line = clear_docstring_keywords(line)
+    return line
+``` 
+
+Directory settings:
+
+- **BASE_DIR**: Full path to the project file. Default value is the *current dir* where the generator is pasted.
+- **SRC_FOLDER**: Relative path to `BASE_DIR` where your source code with `.extension` files with docstring are stored. The default value is `src/` folder. If empty, source folder is same as `BASE_DIR`
+- **SAVE_FOLDER**: Relative path to `BASE_DIR` where your `.md` file with code docstring are going to be stored. The default value is `docs/` folder. If empty, save folder is same as  `BASE_DIR`.
+- **IGNORE_FOLDERS**: List of regex strings of *folder names* that should not generate markdown from. An example of folder you might want to ignore is your python virtualenv, commonly in `venv` folder.
+
+File settings:
+
+- **FILE_EXTENSION**: Name of your language script extension without dot (`.`). The default value is `py` that is the extension of python files.
+

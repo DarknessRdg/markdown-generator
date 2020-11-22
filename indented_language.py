@@ -7,7 +7,7 @@ import sys
 
 # Relative path to BASE_DIR where code to be
 # generated are stored
-SRC_FOLDER = 'example'
+SRC_FOLDER = 'src'
 
 # Relative path to BASE_DIR where all output `.md` files
 # should be created

@@ -37,8 +37,8 @@ DOCSTRING = '"""'
 # Language reserved word that can have a docstring
 # like class, function or method
 LANGUAGE_KEYWORDS = [
-    'class',
-    'def',
+    'class ',
+    'def ',
 ]
 
 

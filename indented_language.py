@@ -315,9 +315,9 @@ def get_file_docstring(file) -> str:
 
     # remove empty string remained from
     # line that had only docstrings
-    if not docs[0]:
+    if docs and not docs[0]:
         docs.pop(0)
-    if not docs[-1]:
+    if docs and not docs[-1]:
         docs.pop()
     return '\n'.join(docs)
 

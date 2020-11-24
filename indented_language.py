@@ -213,9 +213,10 @@ def get_indent(file, function_index):
     return count_white_spaces
 
 
-def get_docstring_range(file, function_index):
-    while not file[function_index].strip().endswith(':'):
-        function_index += 1
+def get_docstring_range(file, function_index, function=True):
+    if function:
+        while not file[function_index].strip().endswith(':'):
+            function_index += 1
 
     index = function_index + 1
 
@@ -304,10 +305,27 @@ def get_docstring_objects(file, index=0, parent=None):
     return objects, index
 
 
+def get_file_docstring(file) -> str:
+    docs_range = get_docstring_range(file, -1, function=False)
+
+    docs = [
+        file[index].replace(DOCSTRING, '')
+        for index in docs_range
+    ]
+
+    # remove empty string remained from
+    # line that had only docstrings
+    if not docs[0]:
+        docs.pop(0)
+    if not docs[-1]:
+        docs.pop()
+    return '\n'.join(docs)
+
+
 def objects_to_markdown(objects) -> str:
     md_lines = []
     for obj in objects:
-        if obj.docstring:
+        if obj.docstring.strip():
             md_lines.append('%s\n' % str(obj))
             md_lines.append(obj.docstring)
     return '\n'.join(md_lines)
@@ -320,16 +338,29 @@ def convert_path_to_posix(path):
 def create_file_markdown(file_path, folder_path):
     posix_path = convert_path_to_posix(file_path)
     logging.info('creating markdown for file %s' % posix_path)
-    with open(file_path) as file_read:
+    with open(file_path, encoding='utf-8') as file_read:
         file = list(map(str.strip, file_read.readlines()))
 
     file_objects, _ = get_docstring_objects(file, 0)
 
     file_name = posix_path.split('/')[-1]
     md_name = file_name.replace('.%s' % FILE_EXTENSION, '.md')
-    save_path = os.path.join(BASE_DIR, folder_path, md_name)
-    with open(save_path, 'w') as file_write:
-        file_write.write(objects_to_markdown(file_objects))
+    folder_path = os.path.join(BASE_DIR, folder_path)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    save_path = os.path.join(folder_path, md_name)
+    file_docstring = get_file_docstring(file)
+
+    can_be_created = bool(file_docstring) or any(
+        bool(file_object.docstring.strip())
+        for file_object in file_objects
+    )
+
+    if can_be_created:
+        with open(save_path, 'w', encoding='utf-8') as file_write:
+            file_write.write(file_docstring)
+            file_write.write(objects_to_markdown(file_objects))
 
 
 def create_folder_files_markdown(path, relative_save_path):

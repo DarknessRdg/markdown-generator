@@ -55,6 +55,9 @@ class TestPropertyName:
         args = '', clazz
         expected = 'MyClass.method(arg1, arg2)'
 
+        instance = Object('def method(self)', *args)
+        assert instance.name == 'MyClass.method()'
+
         instance = Object('def method(self, arg1, arg2)', *args)
         assert instance.name == expected
 

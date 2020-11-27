@@ -128,12 +128,17 @@ class Object(object):
 
                 while self_start > 0 and line[self_start-1] == ' ':
                     self_start -= 1
+
                 while self_end < len(line)-1 and line[self_end+1] in (',', ' '):
                     self_end += 1
 
                 line = list(line)
-                for index in range(self_start, self_end+1):
+                for index in range(self_start, self_end):
                     line.pop(self_start)
+                # remove extra spaces between self and next arg
+                while self_start < len(line) and line[self_start] == ' ':
+                    line.pop(self_start)
+
                 line = ''.join(line)
 
         return line

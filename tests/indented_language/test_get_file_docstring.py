@@ -42,25 +42,28 @@ def file_with_ugly_docstring():
 
 
 def test_should_not_should_not_remove_any_indent(file):
-    docstring = get_file_docstring(file)
+    docstring, index = get_file_docstring(file)
     assert docstring == (
         'Here is my file docstring\n'
         'With many lines\n'
         '\n'
         'And a list here:\n'
         '    - item 1\n'
-        '    - item 2'
+        '    - item 2\n'
     )
+    assert index == 8
 
 
 def test_inline_docstring(file_with_inline_docstring):
-    docstring = get_file_docstring(file_with_inline_docstring)
-    assert docstring == 'Single line docstring'
+    docstring, index = get_file_docstring(file_with_inline_docstring)
+    assert docstring == 'Single line docstring\n'
+    assert index == 1
 
 
 def test_ugly_docstring(file_with_ugly_docstring):
-    docstring = get_file_docstring(file_with_ugly_docstring)
+    docstring, index = get_file_docstring(file_with_ugly_docstring)
     assert docstring == (
         'Here it starts\n'
-        'Here it ends'
+        'Here it ends\n'
     )
+    assert index == 3

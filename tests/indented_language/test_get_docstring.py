@@ -31,9 +31,13 @@ def file(mocker):
     return split
 
 
-def test_returns_docs_without_white_space(file):
+def test_returns_docs_without_white_space(file, mocker):
+    mocker.patch('indented_language.must_backward_indent', return_value=False)
     docs = get_object_docstring(file, FUNCTION)
-    assert docs == '''Returns:\n    - `None`: ...\n'''
+    assert docs == (
+        'Returns:\n'
+        '    - `None`: ...\n'
+    )
 
 
 def test_do_not_remove_extra_spaces(file):
@@ -44,5 +48,5 @@ def test_do_not_remove_extra_spaces(file):
 
 def test_do_include_empty_lines():
     file = ['def function():', '"""start here', '   ', 'ends here"""']
-    expected = 'start here\nends here\n'
+    expected = 'start here\n   \nends here\n'
     assert get_object_docstring(file, 0) == expected

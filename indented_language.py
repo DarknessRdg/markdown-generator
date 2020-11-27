@@ -59,18 +59,34 @@ def clear_line(line):
 
 
 def clear_docstring_keywords(line):
+    def add_break_lines(word):
+        return '\n%s\n\n' % word
+
     def black(word):
-        return '\n**%s**\n\n' % word
+        return add_break_lines('**%s**' % word)
 
     keywords = {
         'Args:': black,
         'Returns:': black,
-        'Raises:': black
+        'Raises:': black,
+        'Attributes:': black,
     }
     with contextlib.suppress(KeyError):
         parser = keywords[line]
         return parser(line)
     return line
+
+
+def must_backward_indent(line):
+    keywords = [
+        'Args:',
+        'Returns:',
+        'Raises:',
+        'Attributes:',
+        'Required attributes:',
+        'Required attributes *if no data provided*:',
+    ]
+    return line.strip() in keywords
 
 
 class TypeOfObject:
@@ -239,6 +255,22 @@ def get_docstring_range(file, function_index, function=True):
     return range(start, end+1)
 
 
+def backward_indent(file, index, base_indent):
+    index += 1
+
+    line = file[index]
+    current_indent = get_indent(file, index - 1)
+
+    backward = current_indent - base_indent
+
+    while index < len(file) and line.strip() and current_indent > base_indent:
+        file[index] = line[backward:]
+
+        index += 1
+        line = file[index]
+        current_indent = get_indent(file, index - 1)
+
+
 def get_object_docstring(file, function_index):
     docs = []
     indented_spaces = get_indent(file, function_index)
@@ -248,13 +280,19 @@ def get_object_docstring(file, function_index):
         line = line[indented_spaces:]
         line = line.replace(DOCSTRING, '')
 
+        if must_backward_indent(line):
+            with contextlib.suppress(KeyError):
+                backward_indent(file, index, indented_spaces)
+
         # parse line as user wishes.
         # Read `clear_line` docstring to understand how to use it
         line = clear_line(line)
+        docs.append(line)
 
-        if line.strip():
-            docs.append(line)
-
+    if docs and not docs[0].strip():
+        docs.pop(0)
+    if docs and not docs[-1].strip():
+        docs.pop()
     return '\n'.join(docs) + '\n'
 
 
@@ -284,8 +322,7 @@ def get_docstring_objects(file, index=0, parent=None):
             index = docs_range.stop
             while indent <= last_indent and parent is not None:
                 parent = parent.parent
-                if parent:
-                    last_indent = parent.indent
+                last_indent = parent.indent if parent else 0
 
             obj = Object(line, docs, parent, indent)
             objects.append(obj)
@@ -305,21 +342,19 @@ def get_docstring_objects(file, index=0, parent=None):
     return objects, index
 
 
-def get_file_docstring(file) -> str:
+def get_file_docstring(file):
     docs_range = get_docstring_range(file, -1, function=False)
 
     docs = [
         file[index].replace(DOCSTRING, '')
         for index in docs_range
     ]
-
-    # remove empty string remained from
-    # line that had only docstrings
-    if docs and not docs[0]:
+    if docs and not docs[0].strip():
         docs.pop(0)
-    if docs and not docs[-1]:
+    if docs and not docs[-1].strip():
         docs.pop()
-    return '\n'.join(docs)
+
+    return '\n'.join(docs) + '\n', docs_range.stop
 
 
 def objects_to_markdown(objects) -> str:
@@ -336,12 +371,16 @@ def convert_path_to_posix(path):
 
 
 def create_file_markdown(file_path, folder_path):
+    def custom_strip(line: str):
+        return line.rstrip('\r').rstrip('\n')
+
     posix_path = convert_path_to_posix(file_path)
     logging.info('creating markdown for file %s' % posix_path)
     with open(file_path, encoding='utf-8') as file_read:
-        file = list(map(str.strip, file_read.readlines()))
+        file = list(map(custom_strip, file_read.readlines()))
 
-    file_objects, _ = get_docstring_objects(file, 0)
+    file_docstring, index = get_file_docstring(file)
+    file_objects, _ = get_docstring_objects(file, index)
 
     file_name = posix_path.split('/')[-1]
     md_name = file_name.replace('.%s' % FILE_EXTENSION, '.md')
@@ -350,8 +389,6 @@ def create_file_markdown(file_path, folder_path):
         os.makedirs(folder_path)
 
     save_path = os.path.join(folder_path, md_name)
-    file_docstring = get_file_docstring(file)
-
     can_be_created = bool(file_docstring) or any(
         bool(file_object.docstring.strip())
         for file_object in file_objects

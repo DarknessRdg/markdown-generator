@@ -1,7 +1,7 @@
 import pytest
 
 from indented_language import get_object_docstring
-
+from tests.indented_language.utils import get_file
 
 FILE = '''
 def function():
@@ -50,3 +50,17 @@ def test_do_include_empty_lines():
     file = ['def function():', '"""start here', '   ', 'ends here"""']
     expected = 'start here\n   \nends here\n'
     assert get_object_docstring(file, 0) == expected
+
+
+def test_function_with_multiple_args_with_indent_different_from_real_indent():
+    file = '''
+    def function(arg1, ag3, ag4
+                 this_args_should_not_break
+    ):
+        """
+        Here is my docs
+        """
+    '''
+    file = list(map(lambda line: line[4:], get_file(file)))
+
+    assert get_object_docstring(file, 0) == 'Here is my docs\n'

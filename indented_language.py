@@ -278,9 +278,11 @@ def backward_indent(file, index, base_indent):
 
 def get_object_docstring(file, function_index):
     docs = []
-    indented_spaces = get_indent(file, function_index)
 
-    for index in get_docstring_range(file, function_index):
+    docs_range = get_docstring_range(file, function_index)
+    indented_spaces = get_indent(file, docs_range.start-1)
+
+    for index in docs_range:
         line = file[index]
         line = line[indented_spaces:]
         line = line.replace(DOCSTRING, '')

@@ -103,3 +103,28 @@ def test_get_function_that_has_more_than_one_line_parameters():
             'here is my docs'
         )
     ]
+
+
+METHODS_WITH_MANY_ARGS = '''
+class MyClass:
+   def method_1(arg1, args2, arg2) -> str:
+        """Here is my docs"""
+        pass
+
+    def method_2(
+            self) -> None:
+        """Here is my docs 2"""
+        pass
+'''
+
+
+def test_methods_with_may_args():
+    file = get_file(METHODS_WITH_MANY_ARGS)
+
+    doc_object, _ = get_docstring_objects(file, 0)
+
+    clazz = Object('class MyClass:', '')
+
+    assert len(doc_object) == 3
+    assert doc_object[-1].parent == clazz
+    assert doc_object[-2].parent == clazz

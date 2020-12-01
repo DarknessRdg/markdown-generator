@@ -315,10 +315,10 @@ def get_docstring_objects(file, index=0, parent=None):
         ])
 
         if has_docs:
-            indent = get_indent(file, index)
-
-            docs = get_object_docstring(file, index)
             docs_range = get_docstring_range(file, index)
+            docs = get_object_docstring(file, index)
+
+            indent = get_indent(file, docs_range.start-1)
 
             function_name = [
                 file[i].strip()

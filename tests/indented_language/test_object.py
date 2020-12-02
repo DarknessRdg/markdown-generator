@@ -70,6 +70,13 @@ class TestPropertyName:
         instance = Object('def method(   self  , arg1, arg2)', *args)
         assert instance.name == expected
 
+    def test_when_name_has_docs_in_args(self):
+        instance = Object('class MyClass(module.Parent):', '')
+        assert instance.name == 'MyClass(module.Parent)'
+
+        instance = Object('def function()', '', instance)
+        assert instance.name == 'MyClass.function()'
+
 
 class TestStr:
     def test_without_parent(self, instance):

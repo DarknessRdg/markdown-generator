@@ -161,15 +161,9 @@ class Object(object):
         parent_name = ''
         if self.parent:
             parent_name = self.parent.name
-
-            parent_name = parent_name.split('.')
-            for index in range(len(parent_name)):
-                _name = parent_name[index]
-                with contextlib.suppress(ValueError):
-                    _name = _name[:_name.index('(')]
-                    parent_name[index] = _name
-
-            parent_name = '.'.join(parent_name) + '.'
+            with contextlib.suppress(ValueError):
+                parent_name = parent_name[:parent_name.index('(')]
+            parent_name += '.'
 
         return parent_name + self._name
 

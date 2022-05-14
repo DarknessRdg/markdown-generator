@@ -456,6 +456,5 @@ def handle_arg(arg):
 if __name__ == '__main__':
     sys.argv.pop(0)
     if sys.argv:
-        pass
         handle_arg(sys.argv[0])
     main()
